@@ -1,0 +1,6 @@
+README.md
+Spacewar/bin
+Spacewar/obj
+XUnit.Coverlet.MSBuild/bin
+XUnit.Coverlet.MSBuild/obj
+XUnit.Coverlet.MSBuild\coverage.json

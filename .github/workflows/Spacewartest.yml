@@ -1,4 +1,4 @@
-name: Square equation BDD
+name: Spacewar_test
 
 on: push
 
@@ -15,11 +15,11 @@ jobs:
           dotnet-version: 7.0.x
 
       - name: Restore dependencies
-        run: dotnet restore Testing.sln
+        run: dotnet restore Testings.sln
 
       - name: Build
-        run: dotnet build Testing.sln --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build Testings.sln --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Unittest and coverage
-        run: dotnet test Testing.sln /p:CollectCoverage=true
+        run: dotnet test Testings.sln /p:CollectCoverage=true
         

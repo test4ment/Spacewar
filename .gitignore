@@ -1,6 +1,7 @@
 README.md
+.vscode
 Spacewar/bin
 Spacewar/obj
-XUnit.Coverlet.MSBuild/bin
-XUnit.Coverlet.MSBuild/obj
-XUnit.Coverlet.MSBuild\coverage.json
+Spacewar.tests/bin
+Spacewar.tests/obj
+Spacewar.tests/coverage.json

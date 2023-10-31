@@ -21,5 +21,7 @@ jobs:
         run: dotnet build Testings.sln --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Unittest and coverage
-        run: dotnet test Testings.sln /p:CollectCoverage=true
-        
+        run: dotnet test Testings.sln /p:CollectCoverage=true /p:Threshold=100 /p:ThresholdType=line
+
+      - name: Check style
+        run: dotnet format --verify-no-changes

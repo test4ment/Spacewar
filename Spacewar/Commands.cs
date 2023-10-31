@@ -1,22 +1,29 @@
-namespace Spacewar;
+﻿namespace Spacewar;
 
-public interface ICommand{
+public interface ICommand
+{
     public void Execute();
 }
 
-public interface IMoveable{
-    public Double[] position {get; set;} // probably we should make Vector type
-    public Double[] instant_velocity {get;}
+public interface IMoveable
+{
+    public double[] position { get; set; } // probably we should make Vector type
+    public double[] instant_velocity { get; }
 }
 
-public class MoveCommand: ICommand{
-    IMoveable moving_object;
+public class MoveCommand : ICommand
+{
+    private readonly IMoveable moving_object;
 
-    public MoveCommand(IMoveable moving_object){
+    public MoveCommand(IMoveable moving_object)
+    {
         this.moving_object = moving_object;
     }
 
-    public void Execute(){
-        moving_object.position = new Double[] {moving_object.position[0] += moving_object.instant_velocity[0], moving_object.position[1] += moving_object.instant_velocity[1]};
+    public void Execute()
+    {
+        var curr_pos = moving_object.position;
+        var vel = moving_object.instant_velocity;
+        moving_object.position = new double[] { curr_pos[0] += vel[0], curr_pos[1] += vel[1] };
     }
 }

@@ -7,8 +7,8 @@ public interface ICommand
 
 public interface IMoveable
 {
-    public int[] position { get; set; } // probably we should make Vector type
-    public int[] instant_velocity { get; }
+    public Vector position { get; set; } // probably we should make Vector type
+    public Vector instant_velocity { get; }
 }
 
 public class MoveCommand : ICommand
@@ -22,8 +22,6 @@ public class MoveCommand : ICommand
 
     public void Execute()
     {
-        var curr_pos = moving_object.position;
-        var vel = moving_object.instant_velocity;
-        moving_object.position = new int[] { curr_pos[0] += vel[0], curr_pos[1] += vel[1] };
+        moving_object.position += moving_object.instant_velocity;
     }
 }

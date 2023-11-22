@@ -15,13 +15,13 @@ jobs:
           dotnet-version: 7.0.x
 
       - name: Restore dependencies
-        run: dotnet restore Testings.sln
+        run: dotnet restore Spacewar.sln
 
       - name: Build
-        run: dotnet build Testings.sln --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build Spacewar.sln --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Unittest and coverage
-        run: dotnet test Testings.sln /p:CollectCoverage=true /p:Threshold=100 /p:ThresholdType=line
+        run: dotnet test Spacewar.sln /p:CollectCoverage=true /p:Threshold=100 /p:ThresholdType=line
 
       - name: Check style
         run: dotnet format --verify-no-changes

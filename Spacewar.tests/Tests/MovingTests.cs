@@ -1,6 +1,6 @@
 ﻿namespace Spacewar.Tests;
 
-[FeatureFile(@"..\..\..\Features\movecommand.feature")]
+[FeatureFile(@"../../../Features/movecommand.feature")]
 public class MovingFeatures : Feature
 {
     Mock<IMoveable> moving_object = new Mock<IMoveable>();

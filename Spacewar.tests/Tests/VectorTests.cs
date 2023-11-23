@@ -1,6 +1,6 @@
 namespace Spacewar.Tests;
 
-[FeatureFile(@"..\..\..\Features\vector.feature")]
+[FeatureFile(@"../../../Features/vector.feature")]
 public class VectorFeatures: Feature{
     public Vector? vec1;
     public Vector? vec2;

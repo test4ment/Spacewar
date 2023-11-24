@@ -25,7 +25,7 @@ public class VectorFeatures : Feature
     [When("складывать")]
     public void Sum()
     {
-        _act = () => {return vec1 + vec2;};
+        _act = () => { return vec1 + vec2; };
     }
 
     [Then(@"получится вектор \(-?(\d+), -?(\d+)\)")]
@@ -37,7 +37,7 @@ public class VectorFeatures : Feature
     [When("сравнивать")]
     public void VectorCompare()
     {
-        _boolact = () => {return vec1.Equals(vec2);};
+        _boolact = () => { return vec1.Equals(vec2); };
     }
 
     [Then("результат ложь")]
@@ -49,6 +49,6 @@ public class VectorFeatures : Feature
     [Then("появляется ошибка")]
     public void AssertThrows()
     {
-        Assert.Throws<ArgumentException>(() => {_act();});
+        Assert.Throws<ArgumentException>(() => { _act(); });
     }
 }

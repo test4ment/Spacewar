@@ -26,14 +26,7 @@
 
     public override bool Equals(object obj)
     {
-        if (GetHashCode() == ((Vector)obj).GetHashCode())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return GetHashCode() == ((Vector)obj).GetHashCode();
     }
 
     public override int GetHashCode()

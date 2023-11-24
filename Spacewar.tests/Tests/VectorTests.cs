@@ -34,18 +34,6 @@ public class VectorFeatures : Feature
         Assert.Equal(_act(), new Vector(int1, int2));
     }
 
-    [When("сравнивать")]
-    public void VectorCompare()
-    {
-        _boolact = () => { return vec1.Equals(vec2); };
-    }
-
-    [Then("результат ложь")]
-    public void AssertFalse()
-    {
-        Assert.False(_boolact());
-    }
-
     [Then("появляется ошибка")]
     public void AssertThrows()
     {

@@ -4,7 +4,7 @@
 public class MovingFeatures : Feature
 {
     private readonly Mock<IMoveable> moving_object = new Mock<IMoveable>();
-    private Exception? except;
+    private Action _act = () => {};
 
     [Given(@"Для объекта, находящегося в точке \(-?(\d+), (-?\d+)\) и движущегося со скоростью \((-?\d+), (-?\d+)\)")]
     public void ObjectPositionVel(int pos1, int pos2, int vel1, int vel2)
@@ -17,19 +17,13 @@ public class MovingFeatures : Feature
     public void ExecuteMove()
     {
         ICommand move = new MoveCommand(moving_object.Object);
-        try
-        {
-            move.Execute();
-        }
-        catch (Exception e)
-        {
-            except = e;
-        }
+        _act = () => {move.Execute();};
     }
 
     [Then(@"движение меняет положение объекта на \(-?(\d+), -?(\d+)\)")]
     public void CheckPos(int pos1, int pos2)
     {
+        _act();
         moving_object.VerifySet(m => m.position = new Vector(pos1, pos2), Times.Once);
         moving_object.VerifyAll();
     }
@@ -37,7 +31,7 @@ public class MovingFeatures : Feature
     [Then("Ошибка")]
     public void AssertExcept()
     {
-        Assert.NotNull(except);
+        Assert.Throws<Exception>(() => {_act();});
     }
 
     [Given("Объект, у которого невозможно прочитать положение объекта в пространстве")]

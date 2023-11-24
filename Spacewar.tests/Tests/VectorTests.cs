@@ -5,9 +5,8 @@ public class VectorFeatures : Feature
 {
     public Vector? vec1;
     public Vector? vec2;
-    public Vector? sum;
-    public Exception? e;
-    public bool equality;
+    public Func<Vector>? _act;
+    public Func<bool>? _boolact;
 
     [Given(@"Вектор \(-?(\d+), -?(\d+)\) и вектор \(-?(\d+), -?(\d+)\)")]
     public void VectorMaker(int int1, int int2, int int3, int int4)
@@ -26,37 +25,30 @@ public class VectorFeatures : Feature
     [When("складывать")]
     public void Sum()
     {
-        try
-        {
-            sum = vec1 + vec2;
-        }
-        catch (Exception e)
-        {
-            this.e = e;
-        }
+        _act = () => {return vec1 + vec2;};
     }
 
     [Then(@"получится вектор \(-?(\d+), -?(\d+)\)")]
     public void VectorEquals(int int1, int int2)
     {
-        Assert.Equal(sum, new Vector(int1, int2));
+        Assert.Equal(_act(), new Vector(int1, int2));
     }
 
     [When("сравнивать")]
     public void VectorCompare()
     {
-        equality = vec1.Equals(vec2);
+        _boolact = () => {return vec1.Equals(vec2);};
     }
 
     [Then("результат ложь")]
     public void AssertFalse()
     {
-        Assert.False(equality);
+        Assert.False(_boolact());
     }
 
     [Then("появляется ошибка")]
     public void AssertThrows()
     {
-        Assert.NotNull(e);
+        Assert.Throws<ArgumentException>(() => {_act();});
     }
 }

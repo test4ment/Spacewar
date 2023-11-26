@@ -31,12 +31,6 @@ public class StartCommand : ICommand{
 
     public void Execute(){
         // var cmd = IoC.Resolve<ICommand>(order.IoC_obj, order.cmd, order.args[0]);
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-            order.orderName,
-            (object[] args) => order
-        ).Execute();
-
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(order.cmd);
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(IoC.Resolve<ICommand>("Game.Operation.Repeat", order.orderName));
     }

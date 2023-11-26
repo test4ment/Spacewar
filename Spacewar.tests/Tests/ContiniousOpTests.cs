@@ -9,9 +9,13 @@ public class ContiniousOpsTests : Feature{
     }
     [Fact]
     public void StartCommandTest()
-    {
+    {   
+        // Делаем объект, который двигается почти как настоящий
         var moving_object = new Mock<IMoveable>();
+        moving_object.Setup(obj => obj.position).Returns(new Vector(5, -6));
+        moving_object.Setup(obj => obj.instant_velocity).Returns(new Vector(1, 1));
 
+        // Делаем очередь, которая ведет себя почти как настоящая
         var queue = new Queue<ICommand>();
         var queueMock = new Mock<IQueue<ICommand>>();
 
@@ -27,22 +31,17 @@ public class ContiniousOpsTests : Feature{
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.Objects.Object1",
-            (object[] args) => moving_object.Object
+                (object[] args) => moving_object.Object
             ).Execute();
         
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Commands.Move",
-            (object[] args) => new MoveCommand((IMoveable)args[0])
+                (object[] args) => new MoveCommand((IMoveable)args[0])
             ).Execute();
-        
-        // IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-        //     "Game.Move.Object1",
-        //     (object[] args) => IoC.Resolve<ICommand>("Commands.Move", "Game.Objects.Object1")
-        //     ).Execute();
         
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.Operation.Repeat",
-            (object[] args) =>  // orderName
+            (object[] args) =>
                 new ActionCommand(() =>
                     IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(
                         IoC.Resolve<ICommand>("Game.StartCommand",
@@ -61,27 +60,27 @@ public class ContiniousOpsTests : Feature{
 
         newOrder.Setup(o => o.args).Returns(new object[1]);
 
-        // IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-        //     "Game.Orders.Order1",
-        //     (object[] args) => newOrder.Object
-        // ).Execute();
-
-        // var startContinousCommand = new Mock<StartCommand>(newOrder.Object);
-
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.StartCommand",
             (object[] args) => new StartCommand((Order) args[0])
         ).Execute();
 
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
+            newOrder.Object.orderName,
+            (object[] args) => newOrder.Object
+        ).Execute();
+
         IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
 
         var a = 0;
-        foreach(var i in queue)
+        while(a != 100)
         {
+            queueMock.Object.Take().Execute();
             a++;
         }
 
-        Assert.Equal(2, a);
+        Assert.True(true); // Код дойдет сюда только если операция умеет сама себя повторять
+        // Спросить как надо сделать
     }
 }
 

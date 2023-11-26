@@ -1,13 +1,14 @@
 namespace Spacewar.Tests;
 
+[FeatureFile(@"../../../Features/continiousoperations.feature")]
 public class ContiniousOpsTests : Feature{
     private readonly Mock<Order> newOrder = new Mock<Order>();
 
-    [Fact]
+    [Given("Инициализирован IoC")]
     public static void IoCInit(){
         new InitScopeBasedIoCImplementationCommand().Execute();
     }
-    [Fact]
+    [And("Объект и приказ для него")]
     public void StartCommandTest()
     {   
         // Делаем объект, который двигается почти как настоящий
@@ -70,12 +71,30 @@ public class ContiniousOpsTests : Feature{
             (object[] args) => newOrder.Object
         ).Execute();
 
-        IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
+        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
 
+        // var a = 0;
+        // while(a != 10)
+        // {
+        //     queueMock.Object.Take().Execute();
+        //     a++;
+        // }
+
+        // Assert.True(true); // Код дойдет сюда только если операция умеет сама себя повторять
+        // // Спросить как надо сделать
+    }
+
+    [When("Executed")]
+    public void Execution(){
+        IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
+    }
+
+    [Then("В очередь приходят ICommand")]
+    public void QueueIsFilling(){
         var a = 0;
-        while(a != 100)
+        while(a != 10)
         {
-            queueMock.Object.Take().Execute();
+            IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();
             a++;
         }
 

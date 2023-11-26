@@ -30,7 +30,6 @@ public class StartCommand : ICommand{
     Order order;
 
     public void Execute(){
-        // var cmd = IoC.Resolve<ICommand>(order.IoC_obj, order.cmd, order.args[0]);
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(order.cmd);
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(IoC.Resolve<ICommand>("Game.Operation.Repeat", order.orderName));
     }

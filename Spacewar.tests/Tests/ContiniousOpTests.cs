@@ -1,16 +1,18 @@
-namespace Spacewar.Tests;
+﻿namespace Spacewar.Tests;
 
 [FeatureFile(@"../../../Features/continiousoperations.feature")]
-public class ContiniousOpsTests : Feature{
+public class ContiniousOpsTests : Feature
+{
     private readonly Mock<Order> newOrder = new Mock<Order>();
 
     [Given("Инициализирован IoC")]
-    public static void IoCInit(){
+    public static void IoCInit()
+    {
         new InitScopeBasedIoCImplementationCommand().Execute();
     }
     [And("Объект и приказ для него")]
     public void StartCommandTest()
-    {   
+    {
         // Делаем объект, который двигается почти как настоящий
         var moving_object = new Mock<IMoveable>();
         moving_object.Setup(obj => obj.position).Returns(new Vector(5, -6));
@@ -22,10 +24,11 @@ public class ContiniousOpsTests : Feature{
 
         queueMock.Setup(q => q.Take()).Returns(() => queue.Dequeue());
         queueMock.Setup(q => q.Put(It.IsAny<ICommand>())).Callback((ICommand obj) => queue.Enqueue(obj));
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-            "Game.Queue", 
-            (object[] args)=> {
+            "Game.Queue",
+            (object[] args) =>
+            {
                 return queueMock.Object;
             }
         ).Execute();
@@ -34,12 +37,12 @@ public class ContiniousOpsTests : Feature{
             "Game.Objects.Object1",
                 (object[] args) => moving_object.Object
             ).Execute();
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Commands.Move",
                 (object[] args) => new MoveCommand((IMoveable)args[0])
             ).Execute();
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.Operation.Repeat",
             (object[] args) =>
@@ -63,36 +66,26 @@ public class ContiniousOpsTests : Feature{
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.StartCommand",
-            (object[] args) => new StartCommand((Order) args[0])
+            (object[] args) => new StartCommand((Order)args[0])
         ).Execute();
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             newOrder.Object.orderName,
             (object[] args) => newOrder.Object
         ).Execute();
-
-        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
-
-        // var a = 0;
-        // while(a != 10)
-        // {
-        //     queueMock.Object.Take().Execute();
-        //     a++;
-        // }
-
-        // Assert.True(true); // Код дойдет сюда только если операция умеет сама себя повторять
-        // // Спросить как надо сделать
     }
 
     [When("Executed")]
-    public void Execution(){
+    public void Execution()
+    {
         IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
     }
 
     [Then("В очередь приходят ICommand")]
-    public void QueueIsFilling(){
+    public static void QueueIsFilling()
+    {
         var a = 0;
-        while(a != 10)
+        while (a != 10)
         {
             IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();
             a++;

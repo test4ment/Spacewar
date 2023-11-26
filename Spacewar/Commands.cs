@@ -26,15 +26,18 @@ public class MoveCommand : ICommand
     }
 }
 
-public class StartCommand : ICommand{
-    Order order;
+public class StartCommand : ICommand
+{
+    private readonly Order order;
 
-    public void Execute(){
+    public void Execute()
+    {
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(order.cmd);
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(IoC.Resolve<ICommand>("Game.Operation.Repeat", order.orderName));
     }
 
-    public StartCommand(Order order){
+    public StartCommand(Order order)
+    {
         this.order = order;
     }
 }

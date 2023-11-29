@@ -1,4 +1,6 @@
-﻿namespace Spacewar;
+﻿using System.Runtime.InteropServices;
+
+namespace Spacewar;
 
 public interface ICommand
 {
@@ -32,26 +34,37 @@ public class StartCommand : ICommand
 
     public void Execute()
     {
-        var command = new MacroCommand(
-            IoC.Resolve<ICommand>(
-                order.cmd, 
-                IoC.Resolve<UObject>(order.objectName)),
-                );
+        // var command = new MacroCommand(
+        //     IoC.Resolve<ICommand>(
+        //         order.cmd, 
+        //         IoC.Resolve<UObject>(order.objectName)),
+        //         );
 
-        foreach(var i in (Dictionary<string, object>)order.args){
+        // var command = IoC.Resolve<ICommand>(
+        //     order.cmd, 
+        //     IoC.Resolve<UObject>(order.objectName)
+        // );
+
+        var command = new ContiniousObjectCommand(order.objectName, order.cmd);
+
+        foreach(var i in (Dictionary<string, object>)order.args.dict){
             IoC.Resolve<UObject>(order.objectName).properties.Set(i.Key, i.Value);
         }
 
-        IoC.Resolve<UObject>(order.objectName).properties.Set(order.cmd, command);
-        IoC.Resolve<UObject>(order.objectName).properties.Set("Commands", )
+        IoC.Resolve<UObject>(order.objectName).properties.Set(
+            order.cmd,
+            IoC.Resolve<ICommand>(
+                order.cmd,
+                IoC.Resolve<UObject>(order.objectName)
+            )
+        );
+        // IoC.Resolve<UObject>(order.objectName).properties.Set("Commands", )
 
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(command);
 
-        // Команда закладывается в объект, в очередь закладывается команда которая итерирует команды в объекте
-    //     1. Resolve "Game.Object.SetValues"(initialValues)
-    // 2. var operation = Resolve "Game.Operation.{order.name}"(order.target)
-    // 3. target.SetProperty("order.name", operation)
-    // 4. Resolve "Game.Queue.Add"(operation)
+        // ((ICommand)(IoC.Resolve<UObject>(
+        //     order.objectName
+        // ).properties.Get(order.cmd))).Execute();
     }
 
     public StartCommand(Order order)
@@ -60,16 +73,33 @@ public class StartCommand : ICommand
     }
 }
 
-public class MacroCommand : ICommand{
-    private readonly List<ICommand> commands = new List<ICommand>();
+// public class MacroCommand : ICommand{
+//     private readonly List<ICommand> commands = new List<ICommand>();
 
-    public MacroCommand(params ICommand[] commands){
-        this.commands = new List<ICommand>(commands);
-    }
+//     public MacroCommand(params ICommand[] commands){
+//         this.commands = new List<ICommand>(commands);
+//     }
+
+//     public void Execute()
+//     {
+//         foreach (var i in commands)
+//         {
+//             i.Execute();
+//         }
+//     }
+// }
+
+public class ContiniousObjectCommand : ICommand{
+    private readonly string obj;
+    private readonly string cmd;
 
     public void Execute(){
-        foreach(var i in commands){
-            i.Execute();
-        }
+        ((ICommand)(IoC.Resolve<UObject>(obj).properties.Get(cmd))).Execute();
+        IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(new ContiniousObjectCommand(obj, cmd));
+    }
+
+    public ContiniousObjectCommand(string obj, string cmd){
+        this.obj = obj;
+        this.cmd = cmd;
     }
 }

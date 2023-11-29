@@ -19,8 +19,6 @@ public class ContiniousOpsTests : Feature
 
         spaceship.Object.properties.Set("Position", new Vector(0, 0));
         spaceship.Object.properties.Set("Velocity", new Vector(0, 0));
-        
-        IMoveable moving_object = new MoveableAdapter(spaceship.Object);
 
         // IMoveable moving_object = new MoveableAdapter(spaceship.Object);
 
@@ -69,28 +67,29 @@ public class ContiniousOpsTests : Feature
             "Game.StartCommand",
             (object[] args) => new StartCommand((Order)args[0])
         ).Execute();
-
-
     }
 
     [When("Executed")]
     public void Execution()
     {
-        IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
+        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
+        IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(
+            new StartCommand(newOrder.Object)
+        );
     }
 
     [Then("В очередь приходят ICommand")]
     public static void QueueIsFilling()
     {
-        var a = 0;
-        while (a != 10)
+        for(var i = 0; i <= 10; i++)
         {
             IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();
-            a++;
         }
 
-        Assert.True(true); // Код дойдет сюда только если операция умеет сама себя повторять
-        // Спросить как надо сделать
+        Assert.Equal(
+            IoC.Resolve<UObject>("Game.Objects.Object1").properties.Get("Position"),
+            new Vector(10, 10)
+        );
     }
 }
 
@@ -105,7 +104,7 @@ internal class ActionCommand : ICommand
 }
 
 internal class ObjDictionary : IDict<string, object>{
-    private readonly Dictionary<string, object> dict = new Dictionary<string, object>();
+    public Dictionary<string, object> dict {get;} = new Dictionary<string, object>();
 
     public object Get(string key){
         return dict[key];

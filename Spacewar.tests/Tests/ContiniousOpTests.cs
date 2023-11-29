@@ -13,12 +13,17 @@ public class ContiniousOpsTests : Feature
     [And("Объект и приказ для него")]
     public void StartCommandTest()
     {
-        // Делаем объект, который двигается почти как настоящий
-        var moving_object = new Mock<IMoveable>();
-        moving_object.Setup(obj => obj.position).Returns(new Vector(5, -6));
-        moving_object.Setup(obj => obj.instant_velocity).Returns(new Vector(1, 1));
+        var spaceship = new Mock<UObject>(new ObjDictionary());
+        // moving_object.Setup(obj => obj.position).Returns(new Vector(0, 0));
+        // moving_object.Setup(obj => obj.instant_velocity).Returns(new Vector(0, 0));
 
-        // Делаем очередь, которая ведет себя почти как настоящая
+        spaceship.Object.properties.Set("Position", new Vector(0, 0));
+        spaceship.Object.properties.Set("Velocity", new Vector(0, 0));
+        
+        IMoveable moving_object = new MoveableAdapter(spaceship.Object);
+
+        // IMoveable moving_object = new MoveableAdapter(spaceship.Object);
+
         var queue = new Queue<ICommand>();
         var queueMock = new Mock<IQueue<ICommand>>();
 
@@ -35,44 +40,37 @@ public class ContiniousOpsTests : Feature
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.Objects.Object1",
-                (object[] args) => moving_object.Object
+                (object[] args) => spaceship.Object
             ).Execute();
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Commands.Move",
-                (object[] args) => new MoveCommand((IMoveable)args[0])
-            ).Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-            "Game.Operation.Repeat",
-            (object[] args) =>
-                new ActionCommand(() =>
-                    IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(
-                        IoC.Resolve<ICommand>("Game.StartCommand",
-                            IoC.Resolve<Order>((string)args[0])
+                (object[] args) => new MoveCommand(
+                    new MoveableAdapter(
+                        (UObject)args[0]
                     )
                 )
-            )
-        ).Execute();
+            ).Execute();
 
-        newOrder.Setup(o => o.orderName).Returns("Game.StartMove.Object1");
-        newOrder.Setup(o => o.cmd).Returns(
-            IoC.Resolve<ICommand>("Commands.Move",
-                IoC.Resolve<IMoveable>("Game.Objects.Object1")
-            )
-        );
+        // IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
+        //     "Game.Operation.Repeat",
+        //     (object[] args) =>
+                
+        //     )
+        // ).Execute();
 
-        newOrder.Setup(o => o.args).Returns(new object[1]);
+        newOrder.Setup(o => o.objectName).Returns("Game.Objects.Object1");
+        newOrder.Setup(o => o.cmd).Returns("Commands.Move");
+        IDict<string, object> newOrderArgs = new ObjDictionary();
+        newOrderArgs.Set("Velocity", new Vector(1, 1));
+        newOrder.Setup(o => o.args).Returns(newOrderArgs);
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.StartCommand",
             (object[] args) => new StartCommand((Order)args[0])
         ).Execute();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-            newOrder.Object.orderName,
-            (object[] args) => newOrder.Object
-        ).Execute();
+
     }
 
     [When("Executed")]
@@ -103,5 +101,17 @@ internal class ActionCommand : ICommand
     public void Execute()
     {
         _action();
+    }
+}
+
+internal class ObjDictionary : IDict<string, object>{
+    private readonly Dictionary<string, object> dict = new Dictionary<string, object>();
+
+    public object Get(string key){
+        return dict[key];
+    }
+
+    public void Set(string key, object value){
+        dict[key] = value;
     }
 }

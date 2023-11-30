@@ -34,7 +34,7 @@ public class StartCommand : ICommand
     {
         var command = new ContiniousObjectCommand(order.target, order.cmd);
 
-        order.args.dict.ToList().ForEach(pair => 
+        order.args.dict.ToList().ForEach(pair =>
             order.target.properties.Set(pair.Key, pair.Value)
         );
 

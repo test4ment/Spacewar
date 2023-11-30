@@ -10,17 +10,13 @@ public class ContiniousOpsTests : Feature
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
     }
-    [And("Объект и приказ для него")]
-    public void StartCommandTest()
+    [And(@"Объект в точке \(-?(\d+), (-?\d+)\) и приказ для начала движения со скоростью \(-?(\d+), (-?\d+)\)")]
+    public void StartCommandTest(int posx, int posy, int velx, int vely)
     {
         var spaceship = new Mock<UObject>(new ObjDictionary());
-        // moving_object.Setup(obj => obj.position).Returns(new Vector(0, 0));
-        // moving_object.Setup(obj => obj.instant_velocity).Returns(new Vector(0, 0));
-
-        spaceship.Object.properties.Set("Position", new Vector(0, 0));
+        
+        spaceship.Object.properties.Set("Position", new Vector(posx, posy));
         spaceship.Object.properties.Set("Velocity", new Vector(0, 0));
-
-        // IMoveable moving_object = new MoveableAdapter(spaceship.Object);
 
         var queue = new Queue<ICommand>();
         var queueMock = new Mock<IQueue<ICommand>>();
@@ -46,49 +42,42 @@ public class ContiniousOpsTests : Feature
                 (object[] args) => new MoveCommand(
                     new MoveableAdapter(
                         (UObject)args[0]
-                    )
+/workspaces/Spacewar/Spacewar.tests                    )
                 )
             ).Execute();
-
-        // IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
-        //     "Game.Operation.Repeat",
-        //     (object[] args) =>
-                
-        //     )
-        // ).Execute();
 
         newOrder.Setup(o => o.objectName).Returns("Game.Objects.Object1");
         newOrder.Setup(o => o.cmd).Returns("Commands.Move");
         IDict<string, object> newOrderArgs = new ObjDictionary();
-        newOrderArgs.Set("Velocity", new Vector(1, 1));
+        newOrderArgs.Set("Velocity", new Vector(velx, vely));
         newOrder.Setup(o => o.args).Returns(newOrderArgs);
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Game.StartCommand",
             (object[] args) => new StartCommand((Order)args[0])
         ).Execute();
-    }
 
-    [When("Executed")]
-    public void Execution()
-    {
-        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(
             new StartCommand(newOrder.Object)
         );
     }
 
-    [Then("В очередь приходят ICommand")]
-    public static void QueueIsFilling()
+    [When(@"Проходит (\d+) итераций")]
+    public void NGameTicks(int n)
     {
-        for(var i = 0; i <= 10; i++)
+        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
+        for(var i = 0; i <= n; i++)
         {
             IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();
         }
+    }
 
+    [Then(@"Объект окажется в точке \(-?(\d+), (-?\d+)\)")]
+    public static void QueueIsFilling(int x, int y)
+    {
         Assert.Equal(
             IoC.Resolve<UObject>("Game.Objects.Object1").properties.Get("Position"),
-            new Vector(10, 10)
+            new Vector(x, y)
         );
     }
 }

@@ -9,8 +9,6 @@ public class MoveableAdapter : IMoveable {
         get => (Vector)_obj.properties.Get("Position");
         set => _obj.properties.Set("Position", value);
     }
-    public Vector instant_velocity {
-        get => (Vector)_obj.properties.Get("Velocity");
-        set => _obj.properties.Set("Velocity", value);
-    }
+    public Vector instant_velocity => (Vector)_obj.properties.Get("Velocity");
+    // set => _obj.properties.Set("Velocity", value);
 }

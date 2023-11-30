@@ -94,7 +94,7 @@ public class ContiniousObjectCommand : ICommand{
     private readonly string cmd;
 
     public void Execute(){
-        ((ICommand)(IoC.Resolve<UObject>(obj).properties.Get(cmd))).Execute();
+        ((ICommand)IoC.Resolve<UObject>(obj).properties.Get(cmd)).Execute();
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(new ContiniousObjectCommand(obj, cmd));
     }
 

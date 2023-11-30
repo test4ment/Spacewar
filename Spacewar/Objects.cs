@@ -7,10 +7,12 @@ public interface Order
     public IDict<string, object> args { get; }
 }
 
-public class UObject{
+public class UObject
+{
     public IDict<string, object> properties;
 
-    public UObject(IDict<string, object> properties){
+    public UObject(IDict<string, object> properties)
+    {
         this.properties = properties;
     }
 }

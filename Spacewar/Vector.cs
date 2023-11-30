@@ -7,8 +7,18 @@
         _values = values;
     }
 
-    public static Vector operator +(Vector left, Vector right)
+    public static Vector operator +(Vector? left, Vector? right)
     {
+        if (left == null)
+        {
+            throw new ArgumentException();
+        }
+
+        if (right == null)
+        {
+            throw new ArgumentException();
+        }
+
         if (left._values.Length != right._values.Length)
         {
             throw new ArgumentException();
@@ -24,8 +34,13 @@
         return new Vector(temp);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
+        if (obj == null)
+        {
+            return false;
+        }
+
         return GetHashCode() == ((Vector)obj).GetHashCode();
     }
 

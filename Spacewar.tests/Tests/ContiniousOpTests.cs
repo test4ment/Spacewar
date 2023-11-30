@@ -42,7 +42,7 @@ public class ContiniousOpsTests : Feature
                 (object[] args) => new MoveCommand(
                     new MoveableAdapter(
                         (UObject)args[0]
-/workspaces/Spacewar/Spacewar.tests                    )
+                    )
                 )
             ).Execute();
 
@@ -63,9 +63,8 @@ public class ContiniousOpsTests : Feature
     }
 
     [When(@"Проходит (\d+) итераций")]
-    public void NGameTicks(int n)
+    public static void NGameTicks(int n)
     {
-        // IoC.Resolve<ICommand>("Game.StartCommand", newOrder.Object).Execute();
         for(var i = 0; i <= n; i++)
         {
             IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();

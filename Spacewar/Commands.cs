@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Spacewar;
+﻿namespace Spacewar;
 
 public interface ICommand
 {
@@ -34,20 +32,10 @@ public class StartCommand : ICommand
 
     public void Execute()
     {
-        // var command = new MacroCommand(
-        //     IoC.Resolve<ICommand>(
-        //         order.cmd, 
-        //         IoC.Resolve<UObject>(order.objectName)),
-        //         );
-
-        // var command = IoC.Resolve<ICommand>(
-        //     order.cmd, 
-        //     IoC.Resolve<UObject>(order.objectName)
-        // );
-
         var command = new ContiniousObjectCommand(order.objectName, order.cmd);
 
-        foreach(var i in (Dictionary<string, object>)order.args.dict){
+        foreach (var i in (Dictionary<string, object>)order.args.dict)
+        {
             IoC.Resolve<UObject>(order.objectName).properties.Set(i.Key, i.Value);
         }
 
@@ -58,13 +46,8 @@ public class StartCommand : ICommand
                 IoC.Resolve<UObject>(order.objectName)
             )
         );
-        // IoC.Resolve<UObject>(order.objectName).properties.Set("Commands", )
 
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(command);
-
-        // ((ICommand)(IoC.Resolve<UObject>(
-        //     order.objectName
-        // ).properties.Get(order.cmd))).Execute();
     }
 
     public StartCommand(Order order)
@@ -73,32 +56,19 @@ public class StartCommand : ICommand
     }
 }
 
-// public class MacroCommand : ICommand{
-//     private readonly List<ICommand> commands = new List<ICommand>();
-
-//     public MacroCommand(params ICommand[] commands){
-//         this.commands = new List<ICommand>(commands);
-//     }
-
-//     public void Execute()
-//     {
-//         foreach (var i in commands)
-//         {
-//             i.Execute();
-//         }
-//     }
-// }
-
-public class ContiniousObjectCommand : ICommand{
+public class ContiniousObjectCommand : ICommand
+{
     private readonly string obj;
     private readonly string cmd;
 
-    public void Execute(){
+    public void Execute()
+    {
         ((ICommand)IoC.Resolve<UObject>(obj).properties.Get(cmd)).Execute();
         IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(new ContiniousObjectCommand(obj, cmd));
     }
 
-    public ContiniousObjectCommand(string obj, string cmd){
+    public ContiniousObjectCommand(string obj, string cmd)
+    {
         this.obj = obj;
         this.cmd = cmd;
     }

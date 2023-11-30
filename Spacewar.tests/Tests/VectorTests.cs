@@ -5,8 +5,8 @@ public class VectorFeatures : Feature
 {
     public Vector vec1 = new Vector();
     public Vector? vec2 = new Vector();
-    public Func<Vector> _act = () => {return new Vector();};
-    public Func<bool> _boolact = () => {return true;};
+    public Func<Vector> _act = () => { return new Vector(); };
+    public Func<bool> _boolact = () => { return true; };
 
     [Given(@"Вектор \(-?(\d+), -?(\d+)\) и вектор \(-?(\d+), -?(\d+)\)")]
     public void VectorMaker(int int1, int int2, int int3, int int4)
@@ -23,7 +23,8 @@ public class VectorFeatures : Feature
     }
 
     [Given(@"Вектор \(-?(\d+)\) и null")]
-    public void VectorAndNull(int int1){
+    public void VectorAndNull(int int1)
+    {
         vec1 = new Vector(int1);
         vec2 = null;
     }
@@ -41,8 +42,9 @@ public class VectorFeatures : Feature
     }
 
     [When("сравнивать")]
-    public void Compare(){
-        _boolact = () => {return vec1.Equals(vec2);};
+    public void Compare()
+    {
+        _boolact = () => { return vec1.Equals(vec2); };
     }
 
     [Then(@"получится вектор \(-?(\d+), -?(\d+)\)")]

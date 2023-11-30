@@ -14,7 +14,7 @@ public class ContiniousOpsTests : Feature
     public void StartCommandTest(int posx, int posy, int velx, int vely)
     {
         var spaceship = new Mock<UObject>(new ObjDictionary());
-        
+
         spaceship.Object.properties.Set("Position", new Vector(posx, posy));
         spaceship.Object.properties.Set("Velocity", new Vector(0, 0));
 
@@ -65,7 +65,7 @@ public class ContiniousOpsTests : Feature
     [When(@"Проходит (\d+) итераций")]
     public static void NGameTicks(int n)
     {
-        for(var i = 0; i <= n; i++)
+        for (var i = 0; i <= n; i++)
         {
             IoC.Resolve<IQueue<ICommand>>("Game.Queue").Take().Execute();
         }
@@ -91,14 +91,17 @@ internal class ActionCommand : ICommand
     }
 }
 
-internal class ObjDictionary : IDict<string, object>{
-    public Dictionary<string, object> dict {get;} = new Dictionary<string, object>();
+internal class ObjDictionary : IDict<string, object>
+{
+    public Dictionary<string, object> dict { get; } = new Dictionary<string, object>();
 
-    public object Get(string key){
+    public object Get(string key)
+    {
         return dict[key];
     }
 
-    public void Set(string key, object value){
+    public void Set(string key, object value)
+    {
         dict[key] = value;
     }
 }

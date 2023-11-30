@@ -1,1 +1,1 @@
-﻿namespace Spacewar;
+namespace Spacewar;

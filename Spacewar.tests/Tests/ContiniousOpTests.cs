@@ -46,7 +46,7 @@ public class ContiniousOpsTests : Feature
                 )
             ).Execute();
 
-        newOrder.Setup(o => o.objectName).Returns("Game.Objects.Object1");
+        newOrder.Setup(o => o.target).Returns(IoC.Resolve<UObject>("Game.Objects.Object1"));
         newOrder.Setup(o => o.cmd).Returns("Commands.Move");
         IDict<string, object> newOrderArgs = new ObjDictionary();
         newOrderArgs.Set("Velocity", new Vector(velx, vely));
@@ -93,7 +93,7 @@ internal class ActionCommand : ICommand
 
 internal class ObjDictionary : IDict<string, object>
 {
-    public Dictionary<string, object> dict { get; } = new Dictionary<string, object>();
+    public IDictionary<string, object> dict { get; } = new Dictionary<string, object>();
 
     public object Get(string key)
     {

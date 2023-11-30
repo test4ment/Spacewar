@@ -32,18 +32,17 @@ public class StartCommand : ICommand
 
     public void Execute()
     {
-        var command = new ContiniousObjectCommand(order.objectName, order.cmd);
+        var command = new ContiniousObjectCommand(order.target, order.cmd);
 
-        foreach (var i in (Dictionary<string, object>)order.args.dict)
-        {
-            IoC.Resolve<UObject>(order.objectName).properties.Set(i.Key, i.Value);
-        }
+        order.args.dict.ToList().ForEach(pair => 
+            order.target.properties.Set(pair.Key, pair.Value)
+        );
 
-        IoC.Resolve<UObject>(order.objectName).properties.Set(
+        order.target.properties.Set(
             order.cmd,
             IoC.Resolve<ICommand>(
                 order.cmd,
-                IoC.Resolve<UObject>(order.objectName)
+                order.target
             )
         );
 
@@ -58,16 +57,16 @@ public class StartCommand : ICommand
 
 public class ContiniousObjectCommand : ICommand
 {
-    private readonly string obj;
+    private readonly UObject obj;
     private readonly string cmd;
 
     public void Execute()
     {
-        ((ICommand)IoC.Resolve<UObject>(obj).properties.Get(cmd)).Execute();
-        IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(new ContiniousObjectCommand(obj, cmd));
+        ((ICommand)obj.properties.Get(cmd)).Execute();
+        IoC.Resolve<IQueue<ICommand>>("Game.Queue").Put(this);
     }
 
-    public ContiniousObjectCommand(string obj, string cmd)
+    public ContiniousObjectCommand(UObject obj, string cmd)
     {
         this.obj = obj;
         this.cmd = cmd;

@@ -2,7 +2,7 @@
 
 public interface Order
 {
-    public string objectName { get; }
+    public UObject target { get; }
     public string cmd { get; }
     public IDict<string, object> args { get; }
 }

@@ -5,7 +5,16 @@ public class DecisionTreeFeatures : Feature{
     public Mock<IDecisionTree<int, Action>> decider = new Mock<IDecisionTree<int, Action>>();
 
     [Fact]
+    public static void IoCInit(){
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Extract.CollisionFeatures", (params object[]) => {
+            
+        }).Execute();
+    }
+
+    [Fact]
     public void Test(){
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Tree.Collision").Execute();
+
         var a4 = new Dictionary<object, object>();
         a4.Add(-1, () => {throw new Exception();});
         var a3 = new Dictionary<object, object>();

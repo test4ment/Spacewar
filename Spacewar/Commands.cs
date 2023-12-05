@@ -73,22 +73,22 @@ public class ContiniousObjectCommand : ICommand
     }
 }
 
-public class CheckCollision : ICommand{
-    public List<int> features = new List<int>();
-    public UObject object1;
-    public UObject object2;
+// public class CheckCollision : ICommand{ // Extract features
+//     public List<int> features = new List<int>();
+//     public UObject object1;
+//     public UObject object2;
     
-    public void Execute(){
-        IoC.Resolve<ICommand>("Tree.Collision", features).Execute();
-    }
-}
+//     public void Execute(){
+//         IoC.Resolve<ICommand>("Tree.Collision", features).Execute();
+//     }
+// }
 
-public class ActionCommand : ICommand
-{
-    private readonly Action _action;
-    public ActionCommand(Action action) => _action = action;
-    public void Execute()
-    {
-        _action();
-    }
-}
+// public class ActionCommand : ICommand
+// {
+//     private readonly Action _action;
+//     public ActionCommand(Action action) => _action = action;
+//     public void Execute()
+//     {
+//         _action();
+//     }
+// }

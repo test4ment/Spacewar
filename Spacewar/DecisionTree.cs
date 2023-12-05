@@ -11,7 +11,7 @@ public class UniversalTree{
         }
     }
 
-    public object GetDecision(object[] features){
-        throw new NotImplementedException();
-    }
+//     public object GetDecision(object[] features){
+//         throw new NotImplementedException();
+//     }
 }

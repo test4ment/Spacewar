@@ -72,23 +72,3 @@ public class ContiniousObjectCommand : ICommand
         this.cmd = cmd;
     }
 }
-
-// public class CheckCollision : ICommand{ // Extract features
-//     public List<int> features = new List<int>();
-//     public UObject object1;
-//     public UObject object2;
-    
-//     public void Execute(){
-//         IoC.Resolve<ICommand>("Tree.Collision", features).Execute();
-//     }
-// }
-
-// public class ActionCommand : ICommand
-// {
-//     private readonly Action _action;
-//     public ActionCommand(Action action) => _action = action;
-//     public void Execute()
-//     {
-//         _action();
-//     }
-// }

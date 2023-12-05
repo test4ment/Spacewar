@@ -8,7 +8,7 @@ public class DecisionTreeFeatures : Feature{
         var tree = new UniversalTree();
         object exceptionAction = () => {throw new Exception("Collision!");};
         
-        tree.AddRecord(new object[]{1, 1, -1, -1}, exceptionAction, tree.tree);
+        UniversalTree.AddRecord(new object[]{1, 1, -1, -1}, exceptionAction, tree.tree);
 
 
         Assert.Equal(((Dictionary<object, object>)((Dictionary<object, object>)((Dictionary<object, object>)tree.tree[1])[1])[-1])[-1], exceptionAction);

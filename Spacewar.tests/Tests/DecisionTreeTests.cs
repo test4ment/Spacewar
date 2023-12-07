@@ -12,7 +12,7 @@ public class DecisionTreeFeatures : Feature
     [Given("Заполненное дерево решений")]
     public void MakeTree()
     {
-        // new InitScopeBasedIoCImplementationCommand().Execute();
+        new InitScopeBasedIoCImplementationCommand().Execute();
 
         // UniversalTree.AddRecord(new object[] { 1, 1, -1, -1 }, exceptionAction, tree.tree);
 
@@ -84,14 +84,12 @@ public class DecisionTreeFeatures : Feature
         {
             { 1, branch2 }
         };
-
-        func = () => { Assert.Equal(manual_dict, IoC.Resolve<Dictionary<object, object>>("Trees.Collision")); };
     }
 
     [Then("Дерево состоит из словаря словарей")]
     public void AssertDictOfDicts()
     {
-        func();
+        Assert.Equal(manual_dict, IoC.Resolve<Dictionary<object, object>>("Trees.Collision"));
     }
 
     internal class ActionCommand : ICommand

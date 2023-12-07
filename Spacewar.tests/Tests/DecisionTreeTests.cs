@@ -3,7 +3,8 @@
 [FeatureFile(@"../../../Features/decisiontree_collision.feature")]
 public class DecisionTreeFeatures : Feature
 {
-    public ITree<object, object> tree = new UniversalTree();
+    // public ITree<object, object> tree = new UniversalTree();
+    public IDictionary<object, object> tree = new Dictionary<object, object>();
     public readonly object exceptionAction = () => { throw new Exception("Collision!"); };
     public Dictionary<object, object> manual_dict = new Dictionary<object, object>();
     public Action func = () => { };
@@ -11,7 +12,57 @@ public class DecisionTreeFeatures : Feature
     [Given("Заполненное дерево решений")]
     public void MakeTree()
     {
-        UniversalTree.AddRecord(new object[] { 1, 1, -1, -1 }, exceptionAction, tree.tree);
+        // new InitScopeBasedIoCImplementationCommand().Execute();
+
+        // UniversalTree.AddRecord(new object[] { 1, 1, -1, -1 }, exceptionAction, tree.tree);
+
+        IoC.Resolve<Hwdtech.ICommand>(
+            "IoC.Register",
+            "Trees.Collision",
+            (object[] args) => { return tree; }
+        ).Execute();
+
+            // (IDictionary<object, object> tree, object[] record, object value) =>
+        IoC.Resolve<Hwdtech.ICommand>(
+            "IoC.Register",
+            "Trees.AddRecord",
+            (object[] args) =>
+            {
+                var tree = (IDictionary<object, object>)args[0];
+                var record = (object[])args[1];
+                var value = args[2];
+                try
+                {
+                    tree.TryAdd(record[0], new Dictionary<object, object>());
+                    IoC.Resolve<bool>("Trees.AddRecord", (IDictionary<object, object>)tree[record[0]], record[1..], value);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    tree[record[0]] = value;
+                    return (object)true;
+                }
+                return (object)false;
+            }
+        ).Execute();
+
+        IoC.Resolve<bool>(
+            "Trees.AddRecord",
+            IoC.Resolve<Dictionary<object, object>>("Trees.Collision"),
+            new object[] { 1, 1, -1, -1 }, 
+            exceptionAction
+        );
+        //     public static void AddRecord(object[] record, object value, IDictionary<object, object> tree)
+        // {
+        // try
+        // {
+        //     _ = tree.TryAdd(record[0], new Dictionary<object, object>());
+        //     AddRecord(record[1..], value, (IDictionary<object, object>)tree[record[0]]);
+        // }
+        // catch (IndexOutOfRangeException)
+        // {
+        //     tree[record[0]] = value;
+        // }
+        // }
     }
 
     [When("Сравнение сгенерированного и сделанного вручную дерева")]
@@ -34,12 +85,31 @@ public class DecisionTreeFeatures : Feature
             { 1, branch2 }
         };
 
-        func = () => { Assert.Equal(manual_dict, tree.tree); };
+        func = () => { Assert.Equal(manual_dict, IoC.Resolve<Dictionary<object, object>>("Trees.Collision")); };
     }
 
     [Then("Дерево состоит из словаря словарей")]
     public void AssertDictOfDicts()
     {
         func();
+    }
+
+    internal class ActionCommand : ICommand
+    {
+        private readonly Action<object[], object, IDictionary<object, object>> action;
+        private readonly object[] arg1;
+        private readonly object arg2;
+        private readonly IDictionary<object, object> arg3;
+        public ActionCommand(Action<object[], object, IDictionary<object, object>> action, object[] arg1, object arg2, IDictionary<object, object> arg3)
+        {
+            this.action = action;
+            this.arg1 = arg1;
+            this.arg2 = arg2;
+            this.arg3 = arg3;
+        }
+        public void Execute()
+        {
+            action(arg1, arg2, arg3);
+        }
     }
 }

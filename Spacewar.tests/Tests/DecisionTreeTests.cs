@@ -41,6 +41,7 @@ public class DecisionTreeFeatures : Feature
                     tree[record[0]] = value;
                     return (object)true;
                 }
+
                 return (object)false;
             }
         ).Execute();
@@ -86,7 +87,7 @@ public class DecisionTreeFeatures : Feature
         };
     }
 
-    [Then("Дерево состоит из словаря словарей")]
+    [Then("Сгенерированное дерево совпадает с ожидаемым")]
     public void AssertDictOfDicts()
     {
         Assert.Equal(manual_dict, IoC.Resolve<Dictionary<object, object>>("Trees.Collision"));

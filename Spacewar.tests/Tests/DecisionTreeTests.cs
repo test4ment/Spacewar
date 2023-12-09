@@ -3,8 +3,6 @@
 [FeatureFile(@"../../../Features/decisiontree_collision.feature")]
 public class DecisionTreeFeatures : Feature
 {
-    // public ITree<object, object> tree = new UniversalTree();
-    public IDictionary<object, object> tree = new Dictionary<object, object>();
     public readonly object exceptionAction = () => { throw new Exception("Collision!"); };
     public Dictionary<object, object> manual_dict = new Dictionary<object, object>();
     public Action func = () => { };
@@ -13,16 +11,15 @@ public class DecisionTreeFeatures : Feature
     public void MakeTree()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
-
-        // UniversalTree.AddRecord(new object[] { 1, 1, -1, -1 }, exceptionAction, tree.tree);
-
+        
+        IDictionary<object, object> tree = new Dictionary<object, object>();
+        
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Collision",
             (object[] args) => { return tree; }
         ).Execute();
 
-            // (IDictionary<object, object> tree, object[] record, object value) =>
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.AddRecord",
@@ -52,18 +49,6 @@ public class DecisionTreeFeatures : Feature
             new object[] { 1, 1, -1, -1 }, 
             exceptionAction
         );
-        //     public static void AddRecord(object[] record, object value, IDictionary<object, object> tree)
-        // {
-        // try
-        // {
-        //     _ = tree.TryAdd(record[0], new Dictionary<object, object>());
-        //     AddRecord(record[1..], value, (IDictionary<object, object>)tree[record[0]]);
-        // }
-        // catch (IndexOutOfRangeException)
-        // {
-        //     tree[record[0]] = value;
-        // }
-        // }
     }
 
     [When("Сравнение сгенерированного и сделанного вручную дерева")]

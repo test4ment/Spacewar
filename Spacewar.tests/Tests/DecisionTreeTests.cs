@@ -11,9 +11,9 @@ public class DecisionTreeFeatures : Feature
     public void MakeTree()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
-        
+
         IDictionary<object, object> tree = new Dictionary<object, object>();
-        
+
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Collision",
@@ -46,7 +46,7 @@ public class DecisionTreeFeatures : Feature
         IoC.Resolve<bool>(
             "Trees.AddRecord",
             IoC.Resolve<Dictionary<object, object>>("Trees.Collision"),
-            new object[] { 1, 1, -1, -1 }, 
+            new object[] { 1, 1, -1, -1 },
             exceptionAction
         );
     }

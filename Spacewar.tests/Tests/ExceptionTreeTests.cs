@@ -1,18 +1,20 @@
-namespace Spacewar.Tests;
+﻿namespace Spacewar.Tests;
 
-public class ExceptionFeatures : Feature{
+public class ExceptionFeatures : Feature
+{
 
     public IDictionary<object, object> ExceptionTree = new Dictionary<object, object>();
-    
+
     [Fact]
-    public void Test(){
+    public void Test()
+    {
 
         new InitScopeBasedIoCImplementationCommand().Execute();
 
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Exceptions",
-            (object[] args) =>{return ExceptionTree;}
+            (object[] args) => { return ExceptionTree; }
         ).Execute();
 
         IoC.Resolve<Hwdtech.ICommand>(
@@ -30,7 +32,7 @@ public class ExceptionFeatures : Feature{
         IoC.Resolve<ICommand>(
             "Trees.AddRecord",
             IoC.Resolve<IDictionary<object, object>>("Trees.Exceptions"),
-            new object[] {typeof(IMoveable), typeof(NotSupportedException)},
+            new object[] { typeof(IMoveable), typeof(NotSupportedException) },
             typeof(NotImplementedException) // new ActionCommand(() => {}) // throw new NotImplementedException();
         ).Execute();
 

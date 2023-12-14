@@ -6,7 +6,7 @@ public class RotatingFeatures : Feature
     private readonly Mock<IRotateable> rotating_object = new Mock<IRotateable>();
     private Action _act = () => { };
 
-    [Given(@"Для объекта, находящегося под углом к горизонту в \(-?(\d+)\) и поворачивающегося со скоростью \((-?\d+)\)")]
+    [Given(@"Для объекта, находящегося под углом к горизонту в \(-?(\d+)\) градусов и поворачивающегося со скоростью \((-?\d+)\) градусов")]
     public void ObjectAngleVel(int ang1, int vel1)
     {
         rotating_object.Setup(obj => obj.angle).Returns(ang1).Verifiable();
@@ -20,11 +20,11 @@ public class RotatingFeatures : Feature
         _act = () => { rotate.Execute(); };
     }
 
-    [Then(@"меняет поворот объекта на \(-?(\d+)\)")]
+    [Then(@"меняет поворот объекта на \(-?(\d+)\) градусов")]
     public void CheckAng(int ang1)
     {
         _act();
-        rotating_object.VerifySet(m => m.angle = ang1, Times.Once);
+        rotating_object.VerifySet(m => m.angle = new ang1 , Times.Once);
         rotating_object.VerifyAll();    
     }
 

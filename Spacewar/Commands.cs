@@ -7,8 +7,8 @@ public interface ICommand
 
 public interface IRotateable
 {
-    public int angle { get; set; }
-    public int angle_velocity { get; }
+    public Angle angle { get; set; }
+    public Angle angle_velocity { get; }
 }
 
 public class RotateCommand : ICommand
@@ -22,6 +22,6 @@ public class RotateCommand : ICommand
 
     public void Execute()
     {
-        rotating_object.angle = ((rotating_object.angle + rotating_object.angle_velocity) % 360) ;
+        rotating_object.angle += rotating_object.angle_velocity;
     }
 }

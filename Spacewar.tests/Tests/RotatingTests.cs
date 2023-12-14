@@ -24,7 +24,7 @@ public class RotatingFeatures : Feature
     public void CheckAng(int ang1)
     {
         _act();
-        rotating_object.VerifySet(m => m.angle = new int(ang1), Times.Once);
+        rotating_object.VerifySet(m => m.angle = ang1, Times.Once);
         rotating_object.VerifyAll();    
     }
 

@@ -12,6 +12,14 @@ public class ExceptionFeatures : Feature
         new InitScopeBasedIoCImplementationCommand().Execute();
 
         IoC.Resolve<Hwdtech.ICommand>(
+            "Scopes.Current.Set", 
+            IoC.Resolve<object>(
+                "Scopes.New",
+                IoC.Resolve<object>("Scopes.Root")
+            )
+        ).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Exceptions",
             (object[] args) => { return ExceptionTree; }

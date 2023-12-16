@@ -9,6 +9,14 @@ public class ContiniousOpsTests : Feature
     public static void IoCInit()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>(
+            "Scopes.Current.Set", 
+            IoC.Resolve<object>(
+                "Scopes.New",
+                IoC.Resolve<object>("Scopes.Root")
+            )
+        ).Execute();
     }
     [And(@"Объект в точке \(-?(\d+), (-?\d+)\) и приказ для начала движения со скоростью \(-?(\d+), (-?\d+)\)")]
     public void StartCommandTest(int posx, int posy, int velx, int vely)

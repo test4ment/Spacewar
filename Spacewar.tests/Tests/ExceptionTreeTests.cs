@@ -8,7 +8,8 @@ public class ExceptionFeatures : Feature
     public IDictionary<object, object> manual_dict = new Dictionary<object, object>();
 
     [Given("Инициализирован IoC")]
-    public static void IoCInit(){
+    public static void IoCInit()
+    {
         new InitScopeBasedIoCImplementationCommand().Execute();
 
         IoC.Resolve<Hwdtech.ICommand>(
@@ -21,7 +22,8 @@ public class ExceptionFeatures : Feature
     }
 
     [And("Готовое дерево с ошибкой")]
-    public void GotTree(){
+    public void GotTree()
+    {
         manual_dict = new Dictionary<object, object>() {
             {
                 typeof(IMoveable),
@@ -36,7 +38,8 @@ public class ExceptionFeatures : Feature
     }
 
     [When("Генерируется дерево обработчика")]
-    public void GenTree(){
+    public void GenTree()
+    {
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Exceptions",
@@ -64,7 +67,8 @@ public class ExceptionFeatures : Feature
     }
 
     [Then("Сгенерированное дерево совпадает с ожидаемым")]
-    public void CompareTree(){
+    public void CompareTree()
+    {
         Assert.Equal(IoC.Resolve<Dictionary<object, object>>("Trees.Exceptions"), manual_dict);
     }
 }

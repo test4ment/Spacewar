@@ -29,8 +29,7 @@ public class ExceptionFeatures : Feature
                 typeof(IMoveable),
                 new Dictionary<object, object>() {
                     {typeof(NotSupportedException),
-                    typeof(NotImplementedException) 
-                    // new ActionCommand(() => {})
+                    typeof(NotImplementedException)
                     }
                 }
             }
@@ -62,7 +61,7 @@ public class ExceptionFeatures : Feature
             "Trees.AddRecord",
             IoC.Resolve<IDictionary<object, object>>("Trees.Exceptions"),
             new object[] { typeof(IMoveable), typeof(NotSupportedException) },
-            typeof(NotImplementedException) // new ActionCommand(() => {}) // throw new NotImplementedException();
+            typeof(NotImplementedException)
         ).Execute();
     }
 

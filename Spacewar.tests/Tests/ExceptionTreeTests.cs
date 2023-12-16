@@ -1,14 +1,14 @@
 ﻿namespace Spacewar.Tests;
 
+[FeatureFile(@"../../../Features/exceptiondecide.feature")]
 public class ExceptionFeatures : Feature
 {
 
     public IDictionary<object, object> ExceptionTree = new Dictionary<object, object>();
+    public IDictionary<object, object> manual_dict = new Dictionary<object, object>();
 
-    [Fact]
-    public void Test()
-    {
-
+    [Given("Инициализирован IoC")]
+    public static void IoCInit(){
         new InitScopeBasedIoCImplementationCommand().Execute();
 
         IoC.Resolve<Hwdtech.ICommand>(
@@ -18,7 +18,25 @@ public class ExceptionFeatures : Feature
                 IoC.Resolve<object>("Scopes.Root")
             )
         ).Execute();
+    }
 
+    [And("Готовое дерево с ошибкой")]
+    public void GotTree(){
+        manual_dict = new Dictionary<object, object>() {
+            {
+                typeof(IMoveable),
+                new Dictionary<object, object>() {
+                    {typeof(NotSupportedException),
+                    typeof(NotImplementedException) 
+                    // new ActionCommand(() => {})
+                    }
+                }
+            }
+        };
+    }
+
+    [When("Генерируется дерево обработчика")]
+    public void GenTree(){
         IoC.Resolve<Hwdtech.ICommand>(
             "IoC.Register",
             "Trees.Exceptions",
@@ -43,19 +61,10 @@ public class ExceptionFeatures : Feature
             new object[] { typeof(IMoveable), typeof(NotSupportedException) },
             typeof(NotImplementedException) // new ActionCommand(() => {}) // throw new NotImplementedException();
         ).Execute();
+    }
 
-        var manual_dict = new Dictionary<object, object>() {
-            {
-                typeof(IMoveable),
-                new Dictionary<object, object>() {
-                    {typeof(NotSupportedException),
-                    typeof(NotImplementedException) 
-                    // new ActionCommand(() => {})
-                    }
-                }
-            }
-        };
-
+    [Then("Сгенерированное дерево совпадает с ожидаемым")]
+    public void CompareTree(){
         Assert.Equal(IoC.Resolve<Dictionary<object, object>>("Trees.Exceptions"), manual_dict);
     }
 }

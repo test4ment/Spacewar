@@ -1,4 +1,4 @@
-namespace Spacewar;
+﻿namespace Spacewar;
 
 public class Angle
 {

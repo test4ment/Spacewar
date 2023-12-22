@@ -39,7 +39,7 @@ public class ContiniousOpsTests : Feature
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register",
             "Commands.Rotate",
-                (object[] args) => new AngleCommand(
+                (object[] args) => new RotateCommand(
                     new RotateableAdapter(
                         (UObject)args[0]
                     )

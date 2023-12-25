@@ -11,6 +11,11 @@ public interface IRotateable
     public Angle angle_velocity { get; }
 }
 
+public interface IArraysFromFileReader
+{
+    public List<int[]> ReadArrays();
+}
+
 public class RotateCommand : ICommand
 {
     private readonly IRotateable rotating_object;

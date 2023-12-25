@@ -1,3 +1,4 @@
+﻿namespace Spacewar.Tests;
 using D = System.Collections.Generic.Dictionary<int, object>;
 
 public class BuildTreeTests

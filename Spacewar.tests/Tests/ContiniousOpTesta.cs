@@ -9,8 +9,16 @@ public class ContiniousOpsTests : Feature
     public static void IoCInit()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>(
+            "Scopes.Current.Set",
+            IoC.Resolve<object>(
+                "Scopes.New",
+                IoC.Resolve<object>("Scopes.Root")
+            )
+        ).Execute();
     }
-    [And(@"Объект под углом (\d+) градусов и приказ для начала поворота со скоростью (\d+) градусов")]
+    [And(@"Объект под углом \(-?(\d+)\) градусов и приказ для начала поворота со скоростью \(-?(\d+)\) градусов")]
     public void StartCommandTest(int angx, int velx)
     {
         var spaceship = new Mock<UObject>(new ObjDictionary());
@@ -71,7 +79,7 @@ public class ContiniousOpsTests : Feature
         }
     }
 
-    [Then(@"Объект окажется под углом (\d+) градусов")]
+    [Then(@"Объект окажется под углом \(-?(\d+)\) градусов")]
     public static void QueueIsFilling(int x)
     {
         Assert.Equal(

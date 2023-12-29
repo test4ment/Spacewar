@@ -11,6 +11,11 @@ public class Angle
 
     public override bool Equals(object? obj)
     {
+        if (obj == null)
+        {
+            return false;
+        }
+
         return GetHashCode() == ((Angle)obj).GetHashCode();
     }
 

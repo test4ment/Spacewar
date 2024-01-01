@@ -5,24 +5,24 @@ public interface ICommand
     public void Execute();
 }
 
-public interface IMoveable
+public interface IRotateable
 {
-    public Vector position { get; set; }
-    public Vector instant_velocity { get; }
+    public Angle angle { get; set; }
+    public Angle angle_velocity { get; }
 }
 
-public class MoveCommand : ICommand
+public class RotateCommand : ICommand
 {
-    private readonly IMoveable moving_object;
+    private readonly IRotateable rotating_object;
 
-    public MoveCommand(IMoveable moving_object)
+    public RotateCommand(IRotateable rotating_object)
     {
-        this.moving_object = moving_object;
+        this.rotating_object = rotating_object;
     }
 
     public void Execute()
     {
-        moving_object.position += moving_object.instant_velocity;
+        rotating_object.angle += rotating_object.angle_velocity;
     }
 }
 

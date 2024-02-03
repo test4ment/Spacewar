@@ -72,3 +72,40 @@ public class ContiniousObjectCommand : ICommand
         this.cmd = cmd;
     }
 }
+
+public class HardStopServer : ICommand{
+    private ServerThread server;
+    
+    public HardStopServer(ServerThread server){
+        this.server = server;
+    }
+
+    public void Execute(){
+        server.Stop();
+    }
+}
+
+public class SoftStopServer : ICommand{
+    private ServerThread server;
+    
+    public SoftStopServer(ServerThread server){
+        this.server = server;
+    }
+
+    public void Execute(){
+        server.SetBehaviour(() => {
+            if (server.q.Count == 0){
+                server.Stop();
+            }
+            else{
+                var c = server.q.Take();
+                try{
+                    c.Execute();
+                }
+                catch(Exception e){
+                    IoC.Resolve<ICommand>("Trees.Exceptions.Handle", c, e);
+                }
+            }
+        });
+    }
+}

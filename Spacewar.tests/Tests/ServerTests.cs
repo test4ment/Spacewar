@@ -1,4 +1,4 @@
-namespace Spacewar.Tests;
+﻿namespace Spacewar.Tests;
 using System.Collections.Concurrent;
 
 [FeatureFile(@"../../../Features/server.feature")]

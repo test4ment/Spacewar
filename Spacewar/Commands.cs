@@ -74,7 +74,7 @@ public class ContiniousObjectCommand : ICommand
 }
 
 public class HardStopServer : ICommand{
-    private ServerThread server;
+    private readonly ServerThread server;
     
     public HardStopServer(ServerThread server){
         this.server = server;
@@ -86,7 +86,7 @@ public class HardStopServer : ICommand{
 }
 
 public class SoftStopServer : ICommand{
-    private ServerThread server;
+    private readonly ServerThread server;
     
     public SoftStopServer(ServerThread server){
         this.server = server;

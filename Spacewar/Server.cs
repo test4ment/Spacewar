@@ -3,7 +3,7 @@ using System.Threading;
 
 public class ServerThread{
     private Thread t;
-    private BlockingCollection<ICommand> q;
+    public BlockingCollection<ICommand> q;
     private bool stop = false;
     private Action behaviour;
 

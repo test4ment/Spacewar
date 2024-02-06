@@ -73,31 +73,40 @@ public class ContiniousObjectCommand : ICommand
     }
 }
 
-public class HardStopServer : ICommand{
+public class HardStopServer : ICommand
+{
     private readonly ServerThread server;
-    
-    public HardStopServer(ServerThread server){
+
+    public HardStopServer(ServerThread server)
+    {
         this.server = server;
     }
 
-    public void Execute(){
+    public void Execute()
+    {
         server.Stop();
     }
 }
 
-public class SoftStopServer : ICommand{
+public class SoftStopServer : ICommand
+{
     private readonly ServerThread server;
-    
-    public SoftStopServer(ServerThread server){
+
+    public SoftStopServer(ServerThread server)
+    {
         this.server = server;
     }
 
-    public void Execute(){
-        server.SetBehaviour(() => {
-            if (server.q.Count == 0){
+    public void Execute()
+    {
+        server.SetBehaviour(() =>
+        {
+            if (server.q.Count == 0)
+            {
                 server.Stop();
             }
-            else{
+            else
+            {
                 var c = server.q.Take();
                 c.Execute();
             }

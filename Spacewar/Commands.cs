@@ -99,12 +99,7 @@ public class SoftStopServer : ICommand{
             }
             else{
                 var c = server.q.Take();
-                try{
-                    c.Execute();
-                }
-                catch(Exception e){
-                    IoC.Resolve<ICommand>("Trees.Exceptions.Handle", c, e);
-                }
+                c.Execute();
             }
         });
     }

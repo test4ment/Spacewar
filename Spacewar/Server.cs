@@ -1,5 +1,5 @@
+namespace Spacewar;
 using System.Collections.Concurrent;
-using System.Threading;
 
 public class ServerThread{
     private Thread t;
@@ -11,12 +11,7 @@ public class ServerThread{
         q = queue;
         behaviour = () => {
             var c = q.Take();
-            try{
-                c.Execute();
-            }
-            catch(Exception e){
-                IoC.Resolve<ICommand>("Trees.Exceptions.Handler", c, e);
-            }
+            c.Execute();
         };
 
         t = new Thread(() => {
@@ -34,4 +29,7 @@ public class ServerThread{
         behaviour = newBeh;
     }
 
+    public void Start(){
+        t.Start();
+    }
 }

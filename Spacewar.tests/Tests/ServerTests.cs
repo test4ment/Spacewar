@@ -87,10 +87,6 @@ public class ServerFeatures : Feature
     [Then(@"В очереди остается (\d+) команд")]
     public static void Remains(int cmds)
     {
-        for (var i = 0; i < 10; i++)
-        {
-        }
-
         Assert.Equal(cmds, IoC.Resolve<BlockingCollection<ICommand>>("Queue").Count);
     }
 

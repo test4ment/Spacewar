@@ -87,6 +87,7 @@ public class ServerFeatures : Feature
     [Then(@"В очереди остается (\d+) команд")]
     public static void Remains(int cmds)
     {
+        Thread.Sleep(150);
         Assert.Equal(cmds, IoC.Resolve<BlockingCollection<ICommand>>("Queue").Count);
     }
 
@@ -95,7 +96,7 @@ public class ServerFeatures : Feature
         public LongComputingCommand() { }
         public void Execute()
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(100);
         }
     }
 }

@@ -91,10 +91,12 @@ public class HardStopServer : ICommand
 public class SoftStopServer : ICommand
 {
     private readonly ServerThread server;
+    private readonly Action action;
 
-    public SoftStopServer(ServerThread server)
+    public SoftStopServer(ServerThread server, Action action)
     {
         this.server = server;
+        this.action = action;
     }
 
     public void Execute()
@@ -104,11 +106,17 @@ public class SoftStopServer : ICommand
             if (server.q.Count == 0)
             {
                 server.Stop();
+                action();
             }
             else
             {
                 var c = server.q.Take();
-                c.Execute();
+                try{
+                    c.Execute();
+                }
+                catch(Exception e){
+                    IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
+                }
             }
         });
     }

@@ -47,21 +47,44 @@ public class ServerFeatures : Feature
     [And("Добавлена пустая команда")]
     public static void NopCmdAdd()
     {
-        var nop = new SomeCommand();
-        IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(nop);
+        var nop = new Mock<ICommand>();
+        nop.Setup(m => m.Execute()).Verifiable();
+
+        IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(nop.Object);
     }
 
     [And("Добавлена команда hard-остановки")]
     public static void HardStopCmdAdd()
     {
-        var stopcmd = new HardStopServer(IoC.Resolve<ServerThread>("Server"));
+        IoC.Resolve<ICommand>("IoC.Register", "Commands.HardStop", (object[] args) => {
+            new ActionCommand(() => {
+                new HardStopServer((ServerThread)args[0])();
+                try{
+                    new ActionCommand((Action)args[1]);
+                }
+                catch{}
+            });
+        }).Execute();
+        
+        var stopcmd = IoC.Resolve<ICommand>("Commands.HardStop", IoC.Resolve<ServerThread>("Server")); //
+
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
     }
 
     [And("Добавлена команда soft-остановки")]
     public static void SoftStopCmdAdd()
     {
-        var stopcmd = new SoftStopServer(IoC.Resolve<ServerThread>("Server"));
+        IoC.Resolve<ICommand>("IoC.Register", "Commands.SoftStop", (object[] args) =>
+        {
+            try{
+                return new SoftStopServer((ServerThread)args[0], (Action)args[1]);
+            }
+            catch{
+                return new SoftStopServer((ServerThread)args[0], () => {});
+            }
+        }).Execute();
+
+        var stopcmd = IoC.Resolve<ICommand>("Commands.SoftStop", IoC.Resolve<ServerThread>("Server"), () => {});
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
     }
 

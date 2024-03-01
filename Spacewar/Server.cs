@@ -14,7 +14,13 @@ public class ServerThread
         behaviour = () =>
         {
             var c = q.Take();
-            c.Execute();
+            try{
+                c.Execute();
+            }
+            catch(Exception e){
+                IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
+            }
+            
         };
 
         t = new Thread(() =>
@@ -26,7 +32,7 @@ public class ServerThread
         });
     }
 
-    public void Stop()
+    internal void Stop()
     {
         stop = true;
     }
@@ -39,5 +45,21 @@ public class ServerThread
     public void Start()
     {
         t.Start();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null){
+            return false;
+        }
+        if (obj.GetType() == typeof(Thread)){
+            return (Thread)obj == t;
+        }
+        return false;
+    }
+    
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 }

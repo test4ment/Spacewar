@@ -56,8 +56,8 @@ public class ServerFeatures : Feature
     [And("Добавлена команда hard-остановки")]
     public static void HardStopCmdAdd()
     {
-        IoC.Resolve<ICommand>("IoC.Register", "Commands.HardStop", (object[] args) => {
-            new ActionCommand(() => {
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.HardStop", (object[] args) => {
+            return new ActionCommand(() => {
                 new HardStopServer((ServerThread)args[0]).Execute();
                 try{
                     new ActionCommand((Action)args[1]).Execute();
@@ -74,7 +74,7 @@ public class ServerFeatures : Feature
     [And("Добавлена команда soft-остановки")]
     public static void SoftStopCmdAdd()
     {
-        IoC.Resolve<ICommand>("IoC.Register", "Commands.SoftStop", (object[] args) =>
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.SoftStop", (object[] args) =>
         {
             try{
                 return new SoftStopServer((ServerThread)args[0], (Action)args[1]);

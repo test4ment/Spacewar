@@ -58,9 +58,9 @@ public class ServerFeatures : Feature
     {
         IoC.Resolve<ICommand>("IoC.Register", "Commands.HardStop", (object[] args) => {
             new ActionCommand(() => {
-                new HardStopServer((ServerThread)args[0])();
+                new HardStopServer((ServerThread)args[0]).Execute();
                 try{
-                    new ActionCommand((Action)args[1]);
+                    new ActionCommand((Action)args[1]).Execute();
                 }
                 catch{}
             });

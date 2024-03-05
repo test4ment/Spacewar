@@ -114,8 +114,16 @@ public class SoftStopServer : ICommand
         {
             if (server.q.Count == 0)
             {
-                server.Stop();
-                action();
+                var decision = new Dictionary<bool, Action>(){
+                    {true, () => {
+                        server.Stop(); 
+                        action();
+                        }
+                    },
+                    {false, () => throw new Exception()}
+                };
+                
+                decision[server.Equals(Thread.CurrentThread)]();
             }
             else
             {

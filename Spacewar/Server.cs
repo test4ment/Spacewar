@@ -48,17 +48,20 @@ public class ServerThread
 
     public override bool Equals(object? obj)
     {
-        if (obj == null){
+        if (obj is null){
             return false;
         }
+        if (obj.GetType() == typeof(ServerThread)){
+            return ((ServerThread)obj).GetHashCode() == t.GetHashCode();
+        }
         if (obj.GetType() == typeof(Thread)){
-            return (Thread)obj == t;
+            return ((Thread)obj).GetHashCode() == t.GetHashCode();
         }
         return false;
     }
     
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        return t.GetHashCode();
     }
 }

@@ -7,7 +7,10 @@ public class ServerFeatures : Feature
     private static ManualResetEvent mre = new ManualResetEvent(false);
     private static ManualResetEvent mreTests = new ManualResetEvent(false);
     private Action act = () => {}; 
-    private Exception? e;
+    private static Func<bool> func;
+    private static ServerThread? server_obj;
+    private static object? obj;
+
 
     [Given("Инициализирован IoC и обработчик исключений")]
     public static void IoCInit()
@@ -160,5 +163,43 @@ public class ServerFeatures : Feature
         mreTests.WaitOne();
         Assert.Equal(cmds, IoC.Resolve<BlockingCollection<ICommand>>("Queue").Count);
         mreTests.Reset();
+    }
+
+    [Given("Сервер и пустая ссылка")]
+    public static void ServerAndNull(){
+        server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
+        obj = null;
+    }
+    
+    [Given("Сервер и новый поток")]
+    public static void ServerAndNewThread(){
+        server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
+        obj = new Thread(() => {});
+    }
+    
+    [Given("Сервер и тот же поток")]
+    public static void ServerAndSameThread(){
+        server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
+        obj = server_obj;
+    }
+    
+    [Given("Сервер и объект")]
+    public static void ServerAndObject(){
+        server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
+        obj = new object();
+    }
+    
+    [When("Сравнивать")]
+    public static void Compare(){
+        func = () => {return server_obj.Equals(obj);};
+    }
+
+    [Then("Результат истина")]
+    public static void AssertTrue(){
+        Assert.True(func());
+    }
+    [Then("Результат ложь")]
+    public static void AssertFalse(){
+        Assert.False(func());
     }
 }

@@ -135,27 +135,23 @@ public class ServerFeatures : Feature
         IoC.Resolve<ServerThread>("Server").Start();
     }
 
-    [When("Попытка выполнить команду остановки из другого потока")]
-    public void TryStopServerOutside(){
-        var server = IoC.Resolve<ServerThread>("Server");
-        var anotherThread = new Thread(() => {
-            try{
-                new HardStopServer(server).Execute();
-            }
-            catch(Exception e){
-                this.e = e;
-            }
-            mreTests.Set();
-        });
-
-        anotherThread.Start();
+    [When("Попытка выполнить команду hard-остановки из другого потока")]
+    public void TryHardStopServerOutside(){
+        act = () => {
+            new HardStopServer(IoC.Resolve<ServerThread>("Server")).Execute();
+        };
+    }
+    
+    [When("Попытка выполнить команду soft-остановки из другого потока")]
+    public void TrySoftStopServerOutside(){
+        act = () => {
+            new SoftStopServer(IoC.Resolve<ServerThread>("Server"), () => {}).Execute();
+        };
     }
     
     [Then("Появляется ошибка")]
     public void AssertException(){
-        mreTests.WaitOne();
-        Assert.IsType<Exception>(e);
-        mreTests.Reset();
+        Assert.Throws<Exception>(act);
     }
 
     [Then(@"В очереди остается (\d+) команд")]

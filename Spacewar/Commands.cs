@@ -76,7 +76,6 @@ public class ContiniousObjectCommand : ICommand
 public class HardStopServer : ICommand
 {
     private readonly ServerThread server;
-
     public HardStopServer(ServerThread server)
     {
         this.server = server;
@@ -106,20 +105,16 @@ public class SoftStopServer : ICommand
 
     public void Execute()
     {
+        if(!server.Equals(Thread.CurrentThread)){
+            throw new Exception();
+        }
+        
         server.SetBehaviour(() =>
         {
             if (server.q.Count == 0)
             {
-                var decision = new Dictionary<bool, Action>(){
-                    {true, () => {
-                        server.Stop(); 
-                        action();
-                        }
-                    },
-                    {false, () => throw new Exception()}
-                };
-                
-                decision[server.Equals(Thread.CurrentThread)]();
+                server.Stop(); 
+                action();
             }
             else
             {

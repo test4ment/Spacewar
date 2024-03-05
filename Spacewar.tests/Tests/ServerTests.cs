@@ -4,10 +4,28 @@ using System.Collections.Concurrent;
 [FeatureFile(@"../../../Features/server.feature")]
 public class ServerFeatures : Feature
 {
-    [Given("Инициализирован IoC")]
+    private static ManualResetEvent mre = new ManualResetEvent(false);
+    private static ManualResetEvent mreTests = new ManualResetEvent(false);
+    private Action act = () => {}; 
+    private Exception? e;
+
+    [Given("Инициализирован IoC и обработчик исключений")]
     public static void IoCInit()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
+        
+        IoC.Resolve<Hwdtech.ICommand>(
+            "Scopes.Current.Set",
+            IoC.Resolve<object>("Scopes.Root")
+        ).Execute();
+
+        try{
+            IoC.Resolve<Hwdtech.ICommand>(
+                "IoC.Register",
+                "Exception.Handler",
+                (object[] args) => {return new Mock<ICommand>().Object;}
+            ).Execute();
+        } catch {}
 
         IoC.Resolve<Hwdtech.ICommand>(
             "Scopes.Current.Set",
@@ -53,6 +71,29 @@ public class ServerFeatures : Feature
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(nop.Object);
     }
 
+    [And("Добавлена команда ожидания MRE")]
+    public static void MreAwaitCmd(){
+        var wait = new Mock<ICommand>();
+        wait.Setup(m => m.Execute()).Callback(() => mre.WaitOne());
+
+        IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(wait.Object);
+    }
+
+    [And("Разблокирован MRE")]
+    public static void MreSet()
+    {
+        mre.Set();
+    }
+
+    [And("Добавлена команда выбрасывающая ошибку")]
+    public static void ExceptCmdAdd()
+    {
+        var except = new Mock<ICommand>();
+        except.Setup(m => m.Execute()).Throws(new Exception()).Verifiable();
+
+        IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(except.Object);
+    }
+
     [And("Добавлена команда hard-остановки")]
     public static void HardStopCmdAdd()
     {
@@ -66,7 +107,7 @@ public class ServerFeatures : Feature
             });
         }).Execute();
         
-        var stopcmd = IoC.Resolve<ICommand>("Commands.HardStop", IoC.Resolve<ServerThread>("Server")); //
+        var stopcmd = IoC.Resolve<ICommand>("Commands.HardStop", IoC.Resolve<ServerThread>("Server"), () => {mreTests.Set();});
 
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
     }
@@ -84,21 +125,8 @@ public class ServerFeatures : Feature
             }
         }).Execute();
 
-        var stopcmd = IoC.Resolve<ICommand>("Commands.SoftStop", IoC.Resolve<ServerThread>("Server"), () => {});
+        var stopcmd = IoC.Resolve<ICommand>("Commands.SoftStop", IoC.Resolve<ServerThread>("Server"), () => {mreTests.Set();});
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
-    }
-
-    [And("Добавлена долгая операция")]
-    public static void AddThinking()
-    {
-        var longcmd = new LongComputingCommand();
-        IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(longcmd);
-    }
-
-    [And(@"Ждать (\d+) секунд")]
-    public static void WaitFor(int seconds)
-    {
-        Thread.Sleep(seconds * 1000);
     }
 
     [When("Запущен сервер")]
@@ -107,19 +135,34 @@ public class ServerFeatures : Feature
         IoC.Resolve<ServerThread>("Server").Start();
     }
 
+    [When("Попытка выполнить команду остановки из другого потока")]
+    public void TryStopServerOutside(){
+        var server = IoC.Resolve<ServerThread>("Server");
+        var anotherThread = new Thread(() => {
+            try{
+                new HardStopServer(server).Execute();
+            }
+            catch(Exception e){
+                this.e = e;
+            }
+            mreTests.Set();
+        });
+
+        anotherThread.Start();
+    }
+    
+    [Then("Появляется ошибка")]
+    public void AssertException(){
+        mreTests.WaitOne();
+        Assert.IsType<Exception>(e);
+        mreTests.Reset();
+    }
+
     [Then(@"В очереди остается (\d+) команд")]
     public static void Remains(int cmds)
     {
-        Thread.Sleep(150);
+        mreTests.WaitOne();
         Assert.Equal(cmds, IoC.Resolve<BlockingCollection<ICommand>>("Queue").Count);
-    }
-
-    internal class LongComputingCommand : ICommand
-    {
-        public LongComputingCommand() { }
-        public void Execute()
-        {
-            Thread.Sleep(100);
-        }
+        mreTests.Reset();
     }
 }

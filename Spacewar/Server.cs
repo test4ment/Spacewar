@@ -20,7 +20,6 @@ public class ServerThread
             catch(Exception e){
                 IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
             }
-            
         };
 
         t = new Thread(() =>

@@ -4,10 +4,10 @@ using System.Collections.Concurrent;
 [FeatureFile(@"../../../Features/server.feature")]
 public class ServerFeatures : Feature
 {
-    private static ManualResetEvent mre = new ManualResetEvent(false);
-    private static ManualResetEvent mreTests = new ManualResetEvent(false);
-    private Action act = () => {}; 
-    private static Func<bool> func = () => {return false;};
+    private static readonly ManualResetEvent mre = new ManualResetEvent(false);
+    private static readonly ManualResetEvent mreTests = new ManualResetEvent(false);
+    private Action act = () => { };
+    private static Func<bool> func = () => { return false; };
     private static ServerThread server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
     private static object? obj;
 
@@ -15,19 +15,21 @@ public class ServerFeatures : Feature
     public static void IoCInit()
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
-        
+
         IoC.Resolve<Hwdtech.ICommand>(
             "Scopes.Current.Set",
             IoC.Resolve<object>("Scopes.Root")
         ).Execute();
 
-        try{
+        try
+        {
             IoC.Resolve<Hwdtech.ICommand>(
                 "IoC.Register",
                 "Exception.Handler",
-                (object[] args) => {return new Mock<ICommand>().Object;}
+                (object[] args) => { return new Mock<ICommand>().Object; }
             ).Execute();
-        } catch {}
+        }
+        catch { }
 
         IoC.Resolve<Hwdtech.ICommand>(
             "Scopes.Current.Set",
@@ -74,7 +76,8 @@ public class ServerFeatures : Feature
     }
 
     [And("Добавлена команда ожидания MRE")]
-    public static void MreAwaitCmd(){
+    public static void MreAwaitCmd()
+    {
         var wait = new Mock<ICommand>();
         wait.Setup(m => m.Execute()).Callback(() => mre.WaitOne());
 
@@ -99,17 +102,20 @@ public class ServerFeatures : Feature
     [And("Добавлена команда hard-остановки")]
     public static void HardStopCmdAdd()
     {
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.HardStop", (object[] args) => {
-            return new ActionCommand(() => {
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.HardStop", (object[] args) =>
+        {
+            return new ActionCommand(() =>
+            {
                 new HardStopServer((ServerThread)args[0]).Execute();
-                try{
+                try
+                {
                     new ActionCommand((Action)args[1]).Execute();
                 }
-                catch{}
+                catch { }
             });
         }).Execute();
-        
-        var stopcmd = IoC.Resolve<ICommand>("Commands.HardStop", IoC.Resolve<ServerThread>("Server"), () => {mreTests.Set();});
+
+        var stopcmd = IoC.Resolve<ICommand>("Commands.HardStop", IoC.Resolve<ServerThread>("Server"), () => { mreTests.Set(); });
 
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
     }
@@ -119,15 +125,17 @@ public class ServerFeatures : Feature
     {
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.SoftStop", (object[] args) =>
         {
-            try{
+            try
+            {
                 return new SoftStopServer((ServerThread)args[0], (Action)args[1]);
             }
-            catch{
-                return new SoftStopServer((ServerThread)args[0], () => {});
+            catch
+            {
+                return new SoftStopServer((ServerThread)args[0], () => { });
             }
         }).Execute();
 
-        var stopcmd = IoC.Resolve<ICommand>("Commands.SoftStop", IoC.Resolve<ServerThread>("Server"), () => {mreTests.Set();});
+        var stopcmd = IoC.Resolve<ICommand>("Commands.SoftStop", IoC.Resolve<ServerThread>("Server"), () => { mreTests.Set(); });
         IoC.Resolve<BlockingCollection<ICommand>>("Queue").Add(stopcmd);
     }
 
@@ -138,21 +146,26 @@ public class ServerFeatures : Feature
     }
 
     [When("Попытка выполнить команду hard-остановки из другого потока")]
-    public void TryHardStopServerOutside(){
-        act = () => {
+    public void TryHardStopServerOutside()
+    {
+        act = () =>
+        {
             new HardStopServer(IoC.Resolve<ServerThread>("Server")).Execute();
         };
     }
-    
+
     [When("Попытка выполнить команду soft-остановки из другого потока")]
-    public void TrySoftStopServerOutside(){
-        act = () => {
-            new SoftStopServer(IoC.Resolve<ServerThread>("Server"), () => {}).Execute();
+    public void TrySoftStopServerOutside()
+    {
+        act = () =>
+        {
+            new SoftStopServer(IoC.Resolve<ServerThread>("Server"), () => { }).Execute();
         };
     }
-    
+
     [Then("Появляется ошибка")]
-    public void AssertException(){
+    public void AssertException()
+    {
         Assert.Throws<Exception>(act);
     }
 
@@ -165,40 +178,47 @@ public class ServerFeatures : Feature
     }
 
     [Given("Сервер и пустая ссылка")]
-    public static void ServerAndNull(){
+    public static void ServerAndNull()
+    {
         server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
         obj = null;
     }
-    
+
     [Given("Сервер и новый поток")]
-    public static void ServerAndNewThread(){
+    public static void ServerAndNewThread()
+    {
         server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
-        obj = new Thread(() => {});
+        obj = new Thread(() => { });
     }
-    
+
     [Given("Сервер и тот же поток")]
-    public static void ServerAndSameThread(){
+    public static void ServerAndSameThread()
+    {
         server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
         obj = server_obj;
     }
-    
+
     [Given("Сервер и объект")]
-    public static void ServerAndObject(){
+    public static void ServerAndObject()
+    {
         server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
         obj = new object();
     }
-    
+
     [When("Сравнивать")]
-    public static void Compare(){
-        func = () => {return server_obj.Equals(obj);};
+    public static void Compare()
+    {
+        func = () => { return server_obj.Equals(obj); };
     }
 
     [Then("Результат истина")]
-    public static void AssertTrue(){
+    public static void AssertTrue()
+    {
         Assert.True(func());
     }
     [Then("Результат ложь")]
-    public static void AssertFalse(){
+    public static void AssertFalse()
+    {
         Assert.False(func());
     }
 }

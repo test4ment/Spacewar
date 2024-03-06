@@ -105,24 +105,27 @@ public class SoftStopServer : ICommand
 
     public void Execute()
     {
-        if(!server.Equals(Thread.CurrentThread)){
+        if (!server.Equals(Thread.CurrentThread))
+        {
             throw new Exception();
         }
-        
+
         server.SetBehaviour(() =>
         {
             if (server.q.Count == 0)
             {
-                server.Stop(); 
+                server.Stop();
                 action();
             }
             else
             {
                 var c = server.q.Take();
-                try{
+                try
+                {
                     c.Execute();
                 }
-                catch(Exception e){
+                catch (Exception e)
+                {
                     IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
                 }
             }

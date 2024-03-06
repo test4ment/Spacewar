@@ -14,10 +14,12 @@ public class ServerThread
         behaviour = () =>
         {
             var c = q.Take();
-            try{
+            try
+            {
                 c.Execute();
             }
-            catch(Exception e){
+            catch (Exception e)
+            {
                 IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
             }
         };
@@ -48,18 +50,24 @@ public class ServerThread
 
     public override bool Equals(object? obj)
     {
-        if (obj is null){
+        if (obj is null)
+        {
             return false;
         }
-        if (obj.GetType() == typeof(ServerThread)){
+
+        if (obj.GetType() == typeof(ServerThread))
+        {
             return ((ServerThread)obj).GetHashCode() == t.GetHashCode();
         }
-        if (obj.GetType() == typeof(Thread)){
+
+        if (obj.GetType() == typeof(Thread))
+        {
             return ((Thread)obj).GetHashCode() == t.GetHashCode();
         }
+
         return false;
     }
-    
+
     public override int GetHashCode()
     {
         return t.GetHashCode();

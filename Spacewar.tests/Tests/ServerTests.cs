@@ -7,10 +7,9 @@ public class ServerFeatures : Feature
     private static ManualResetEvent mre = new ManualResetEvent(false);
     private static ManualResetEvent mreTests = new ManualResetEvent(false);
     private Action act = () => {}; 
-    private static Func<bool> func;
-    private static ServerThread? server_obj;
+    private static Func<bool> func = () => {return false;};
+    private static ServerThread server_obj = new ServerThread(new Mock<BlockingCollection<ICommand>>().Object);
     private static object? obj;
-
 
     [Given("Инициализирован IoC и обработчик исключений")]
     public static void IoCInit()

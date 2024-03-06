@@ -114,7 +114,7 @@ public class SoftStopServer : ICommand
         {
             if (server.q.Count == 0)
             {
-                server.Stop(); 
+                server.Stop();
                 action();
             }
             else

@@ -62,7 +62,7 @@ public class ServerThread
 
         if (obj.GetType() == typeof(Thread))
         {
-            return ((Thread)obj).GetHashCode() == t.GetHashCode();
+            return ((Thread)obj) == t;
         }
 
         return false;

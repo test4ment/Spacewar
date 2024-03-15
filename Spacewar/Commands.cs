@@ -72,3 +72,63 @@ public class ContiniousObjectCommand : ICommand
         this.cmd = cmd;
     }
 }
+
+public class HardStopServer : ICommand
+{
+    private readonly ServerThread server;
+    public HardStopServer(ServerThread server)
+    {
+        this.server = server;
+    }
+
+    public void Execute()
+    {
+        var decision = new Dictionary<bool, Action>(){
+            {true, server.Stop},
+            {false, () => throw new Exception()}
+        };
+
+        decision[server.Equals(Thread.CurrentThread)]();
+    }
+}
+
+public class SoftStopServer : ICommand
+{
+    private readonly ServerThread server;
+    private readonly Action action;
+
+    public SoftStopServer(ServerThread server, Action action)
+    {
+        this.server = server;
+        this.action = action;
+    }
+
+    public void Execute()
+    {
+        if (!server.Equals(Thread.CurrentThread))
+        {
+            throw new Exception();
+        }
+
+        server.SetBehaviour(() =>
+        {
+            if (server.q.Count == 0)
+            {
+                server.Stop();
+                action();
+            }
+            else
+            {
+                var c = server.q.Take();
+                try
+                {
+                    c.Execute();
+                }
+                catch (Exception e)
+                {
+                    IoC.Resolve<ICommand>("Exception.Handler", e, c).Execute();
+                }
+            }
+        });
+    }
+}
